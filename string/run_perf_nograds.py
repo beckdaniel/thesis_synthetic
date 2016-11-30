@@ -22,24 +22,24 @@ for slen in SLENS:
     data = [[''.join([random.choice(ALPHABET) for j in xrange(slen)])] for i in xrange(100)]
 
     # Naive SK
-    sk = flakes.string.StringKernel(order_coefs=COEFS, alphabet=list(ALPHABET), mode='cynaive')
-    before = dt.datetime.now()
+    #sk = flakes.string.StringKernel(order_coefs=COEFS, alphabet=list(ALPHABET), mode='cynaive')
+    #before = dt.datetime.now()
     #print sk.K(data)
-    sk.K(data)
-    after = dt.datetime.now()
-    naive_times.append((after-before).total_seconds())
+    #sk.K(data)
+    #after = dt.datetime.now()
+    #naive_times.append((after-before).total_seconds())
     #print "CYTHON NAIVE SK: ", after-before
 
     # Numpy SK
-    sk = flakes.string.StringKernel(order_coefs=COEFS, alphabet=list(ALPHABET), mode='numpy')
+    sk = flakes.string.StringKernel(order_coefs=COEFS, alphabet=list(ALPHABET), mode='numpy-nograds')
     before = dt.datetime.now()
     sk.K(data)
     after = dt.datetime.now()
     #print "NUMPY SK: ", after-before
     numpy_times.append((after-before).total_seconds())
 
-np.savetxt(os.path.join(OUTPUT_DIR, 'sk_naive.tsv'), naive_times)
-np.savetxt(os.path.join(OUTPUT_DIR, 'sk_numpy.tsv'), numpy_times)
+#np.savetxt(os.path.join(OUTPUT_DIR, 'sk_naive.tsv'), naive_times)
+np.savetxt(os.path.join(OUTPUT_DIR, 'sk_numpy_nograds.tsv'), numpy_times)
 
 # TF SK
 #sk = flakes.string.StringKernel(order_coefs=COEFS, alphabet=list(ALPHABET), mode='tf')
