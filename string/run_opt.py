@@ -20,12 +20,13 @@ OUTPUT_DIR = sys.argv[1]
 random.seed(1000)
 np.random.seed(1000)
 SLEN = 40
-SIZES = [10, 20, 50, 100, 200, 500]
+#SIZES = [10, 20, 50, 100, 200, 500]
 #SIZES = [10, 20]
+SIZES = [1000]
 
 
 
-x_all = np.array([[''.join([random.choice(ALPHABET) for j in xrange(SLEN)])] for i in xrange(500)])
+x_all = np.array([[''.join([random.choice(ALPHABET) for j in xrange(SLEN)])] for i in xrange(1000)])
 #sk = flakes.string.StringKernel(gap_decay=GAP, match_decay=MATCH, order_coefs=COEFS, alphabet=list(ALPHABET), mode='tf-batch')
 #gram = sk.K(x_all)
 #print gram + (np.eye(x.shape[0]) * NOISE)
@@ -57,11 +58,11 @@ for size in SIZES:
     #rmses = []
     #nlpds = []
     for i in xrange(20):
-        sk = flakes.string.StringKernel(gap_decay=GAP, match_decay=MATCH, order_coefs=COEFS, alphabet=list(ALPHABET), mode='tf-batch')
+        sk = flakes.string.StringKernel(gap_decay=GAP, match_decay=MATCH, order_coefs=COEFS, alphabet=list(ALPHABET), mode='tf-batch', device='/gpu:0')
         gram = sk.K(x_train)
         y_train = np.random.multivariate_normal([0] * x_train.shape[0], gram + (np.eye(x_train.shape[0]) * NOISE))[:, None]
 
-        sk2 = flakes.wrappers.gpy.GPyStringKernel(order_coefs=[1.0] * 3, alphabet=list(ALPHABET), mode='tf-batch', batch_size=100)
+        sk2 = flakes.wrappers.gpy.GPyStringKernel(order_coefs=[1.0] * 3, alphabet=list(ALPHABET), mode='tf-batch', device='/gpu:0')
         model = GPy.models.GPRegression(x_train, y_train, kernel=sk2)
         model.randomize()
         #print model
