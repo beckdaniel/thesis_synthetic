@@ -9,7 +9,8 @@ import os
 #SLEN = int(sys.argv[1])
 SLENS = range(10, 101, 10)
 #ALPHABET = 'actg'
-ALPHABET = string.ascii_lowercase
+#ALPHABET = string.ascii_lowercase
+ALPHABET = string.ascii_letters
 COEFS = [1.0] * 5
 OUTPUT_DIR = sys.argv[1]
 random.seed(1000)
