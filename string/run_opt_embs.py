@@ -12,6 +12,7 @@ from scipy.stats.stats import pearsonr
 #SIZES = [10, 20, 50, 100, 200, 500, 1000]
 #SIZES = [50, 100, 200, 500, 1000]
 SIZES = [500, 1000]
+#SIZES = [10, 20]
 np.random.seed(1000)
 OUTPUT_DIR = sys.argv[1]
 DEVICE = sys.argv[3]
@@ -80,19 +81,21 @@ for size in SIZES:
     metrics_mat32 = []
     metrics_mat52 = []
     
+    sk = flakes.string.StringKernel(gap_decay=GAP, match_decay=MATCH, order_coefs=COEFS, embs=embs, index=words, mode='tf-batch', device=DEVICE, batch_size=100)    
+    gram = sk.K(x)
+    del sk
     
-
     for i in xrange(20):
-        sk = flakes.string.StringKernel(gap_decay=GAP, match_decay=MATCH, order_coefs=COEFS, embs=embs, index=words, mode='tf-batch', device=DEVICE, batch_size=100)
+
 
         #gram = sk.K(x_train)
         #y_train = np.random.multivariate_normal([0] * x_train.shape[0], gram + (np.eye(x_train.shape[0]) * NOISE))[:, None]
-        gram = sk.K(x)
+
         y = np.random.multivariate_normal([0] * x.shape[0], gram + (np.eye(x.shape[0]) * NOISE))[:, None]
         y_train = y[:size]
         y_test = y[size:]
         
-        sk2 = flakes.wrappers.gpy.GPyStringKernel(order_coefs=[1.0] * 3, embs=embs, index=words, mode='tf-batch', device=DEVICE)
+        sk2 = flakes.wrappers.gpy.GPyStringKernel(order_coefs=[1.0] * 3, embs=embs, index=words, mode='tf-batch', device=DEVICE, batch_size=100)
 
         model = GPy.models.GPRegression(x_train, y_train, kernel=sk2)
         model.randomize()
@@ -156,17 +159,20 @@ for size in SIZES:
                           np.sqrt(MSE(preds, y_test))])
         
 
-    np.savetxt(os.path.join(size_dir, 'gaps.tsv'), gaps)
-    np.savetxt(os.path.join(size_dir, 'matches.tsv'), matches)
-    np.savetxt(os.path.join(size_dir, 'coefs_1.tsv'), coefs_1)
-    np.savetxt(os.path.join(size_dir, 'coefs_2.tsv'), coefs_2)
-    np.savetxt(os.path.join(size_dir, 'coefs_3.tsv'), coefs_3)
-    np.savetxt(os.path.join(size_dir, 'noises.tsv'), noises)
+        np.savetxt(os.path.join(size_dir, 'gaps.tsv'), gaps)
+        np.savetxt(os.path.join(size_dir, 'matches.tsv'), matches)
+        np.savetxt(os.path.join(size_dir, 'coefs_1.tsv'), coefs_1)
+        np.savetxt(os.path.join(size_dir, 'coefs_2.tsv'), coefs_2)
+        np.savetxt(os.path.join(size_dir, 'coefs_3.tsv'), coefs_3)
+        np.savetxt(os.path.join(size_dir, 'noises.tsv'), noises)
 
-    np.savetxt(os.path.join(size_dir, 'metrics_b.tsv'), metrics_b)
-    np.savetxt(os.path.join(size_dir, 'metrics_a.tsv'), metrics_a)
+        np.savetxt(os.path.join(size_dir, 'metrics_b.tsv'), metrics_b)
+        np.savetxt(os.path.join(size_dir, 'metrics_a.tsv'), metrics_a)
 
-    np.savetxt(os.path.join(size_dir, 'metrics_lin.tsv'), metrics_lin)
-    np.savetxt(os.path.join(size_dir, 'metrics_rbf.tsv'), metrics_rbf)
-    np.savetxt(os.path.join(size_dir, 'metrics_mat32.tsv'), metrics_mat32)
-    np.savetxt(os.path.join(size_dir, 'metrics_mat52.tsv'), metrics_mat52)
+        np.savetxt(os.path.join(size_dir, 'metrics_lin.tsv'), metrics_lin)
+        np.savetxt(os.path.join(size_dir, 'metrics_rbf.tsv'), metrics_rbf)
+        np.savetxt(os.path.join(size_dir, 'metrics_mat32.tsv'), metrics_mat32)
+        np.savetxt(os.path.join(size_dir, 'metrics_mat52.tsv'), metrics_mat52)
+
+        del model
+        del sk2
