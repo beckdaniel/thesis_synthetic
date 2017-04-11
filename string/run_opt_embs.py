@@ -9,14 +9,15 @@ from sklearn.metrics import mean_absolute_error as MAE
 from sklearn.metrics import mean_squared_error as MSE
 from scipy.stats.stats import pearsonr
 
-SIZES = [10, 20, 50, 100, 200, 500, 1000]
-#SIZES = [100, 200]
+#SIZES = [10, 20, 50, 100, 200, 500, 1000]
+#SIZES = [50, 100, 200, 500, 1000]
+SIZES = [500, 1000]
 np.random.seed(1000)
 OUTPUT_DIR = sys.argv[1]
 DEVICE = sys.argv[3]
 EMBS = sys.argv[2]
 COEFS = [1.0, 0.5, 0.25]
-NOISE = 0.01
+NOISE = 0.1
 GAP = 0.5
 MATCH = 0.2
 
@@ -82,7 +83,7 @@ for size in SIZES:
     
 
     for i in xrange(20):
-        sk = flakes.string.StringKernel(gap_decay=GAP, match_decay=MATCH, order_coefs=COEFS, embs=embs, index=words, mode='tf-batch', device=DEVICE)
+        sk = flakes.string.StringKernel(gap_decay=GAP, match_decay=MATCH, order_coefs=COEFS, embs=embs, index=words, mode='tf-batch', device=DEVICE, batch_size=100)
 
         #gram = sk.K(x_train)
         #y_train = np.random.multivariate_normal([0] * x_train.shape[0], gram + (np.eye(x_train.shape[0]) * NOISE))[:, None]
